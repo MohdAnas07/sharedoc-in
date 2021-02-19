@@ -3,11 +3,9 @@ const multer = require('multer');
 const path = require('path');
 const File = require('../models/file');
 const { v4: uuidv4 } = require('uuid');
-const { request } = require('http');
 
 
-
-//Multer file configuration setUp 
+// Configuration of Muler for files handing
 let storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'uploads/'),
     filename: (req, file, cb) => {
@@ -19,7 +17,7 @@ let storage = multer.diskStorage({
 let upload = multer({ storage, limits: { fileSize: 1000000 * 100 }, }).single('myfile'); //100mb
 
 
-
+//Router for uploading file on server
 router.post('/', (req, res) => {
     upload(req, res, async(err) => {
         if (err) {
@@ -32,14 +30,13 @@ router.post('/', (req, res) => {
             size: req.file.size
         });
         const response = await file.save();
-        res.json({ file: `${process.env.APP_BASE_URL}/files/${response.uuid}` });
+        res.json({ file: `${process.env.APP_BASE_URL}files/${response.uuid}` });
     });
 });
 
+//Router for Send Email 
 router.post('/send', async(req, res) => {
-
-    const { uuid, emailTo, emailFrom } = req.body;
-
+    const { uuid, emailTo, emailFrom, expiresIn } = req.body;
     if (!uuid || !emailTo || !emailFrom) {
         return res.status(422).send({ error: 'All fields are required except expiry.' });
     }
@@ -52,13 +49,12 @@ router.post('/send', async(req, res) => {
         file.sender = emailFrom;
         file.receiver = emailTo;
         const response = await file.save();
-
         // send mail
         const sendMail = require('../services/mailService');
         sendMail({
             from: emailFrom,
             to: emailTo,
-            subject: 'ShareDoc file sharing',
+            subject: 'inShare file sharing',
             text: `${emailFrom} shared a file with you.`,
             html: require('../services/emailTemplate')({
                 emailFrom,
@@ -76,7 +72,6 @@ router.post('/send', async(req, res) => {
     }
 
 });
-
 
 
 module.exports = router;
