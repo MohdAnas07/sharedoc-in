@@ -18,6 +18,9 @@ app.set('view engine', 'ejs');
 
 
 //Routes 
+app.get('/', (req, res) => {
+    res.render('index');
+})
 app.use('/api/files', require('./routes/files'));
 app.use('/files', require('./routes/show'));
 app.use('/files/download', require('./routes/download'));
