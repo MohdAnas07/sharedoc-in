@@ -4,8 +4,6 @@ const path = require('path');
 const File = require('../models/file');
 const { v4: uuidv4 } = require('uuid');
 
-
-// Configuration of Muler for files handing
 let storage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, 'uploads/'),
     filename: (req, file, cb) => {
@@ -16,8 +14,6 @@ let storage = multer.diskStorage({
 
 let upload = multer({ storage, limits: { fileSize: 1000000 * 100 }, }).single('myfile'); //100mb
 
-
-//Router for uploading file on server
 router.post('/', (req, res) => {
     upload(req, res, async(err) => {
         if (err) {
@@ -34,7 +30,7 @@ router.post('/', (req, res) => {
     });
 });
 
-//Router for Send Email 
+
 router.post('/send', async(req, res) => {
     const { uuid, emailTo, emailFrom, expiresIn } = req.body;
     if (!uuid || !emailTo || !emailFrom) {
@@ -72,6 +68,7 @@ router.post('/send', async(req, res) => {
     }
 
 });
+
 
 
 module.exports = router;
